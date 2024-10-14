@@ -1353,18 +1353,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const booksPerPage = 20; // Number of books per page
     let currentPage = 1; // Current page
     let clickedwishicon = false
+    let allgenres = []
     // Fetch books for the specified page
-    const fetchBooks = async (page = 1) => {
+    const fetchBooks = async (page = 1,searchterm="") => {
         loadingSpinner.classList.remove('hidden'); 
-        const wishicon = document.getElementById("wishicon");
-         clickedwishicon = false
-      wishicon.addEventListener("click", function() {
-        // Code to execute when the element is clicked
-        console.log("Wish icon clicked!");
-        clickedwishicon=true
         
-        // You can perform any action here, like changing the icon, style, or other behavior
-      });
         if(page == 1){
             prevpage.classList.add('hidden');
     
@@ -1378,7 +1371,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // const response = await fetch(url);
             // const data = await response.json();
             const data = api
-
+            allBooks = api.results;
             // Hide loading spinner
             loadingSpinner.classList.add('hidden');
 
@@ -1414,51 +1407,100 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // fetchBooks(); // Call the function when clicked
       });
-      
+      const dropdown = document.getElementById('drpdwn');
+
+      const populateDropdown = (genres) => {
+          genres.forEach((genre) => {
+              if (genre) {  // Skip null values
+                  const option = document.createElement('option');
+                  option.value = genre;
+                  option.textContent = genre;
+                  dropdown.appendChild(option);
+              }
+          });
+      };
 
     // Display books for the current page
     const displayBooks = (books) => {
         bookGrid.innerHTML = ''; 
-            books.forEach((book, index) => {
-                const { title, authors, formats,id,subjects } = book;
-                const authorName = authors.length > 0 ? authors[0].name : "Unknown Author";
-               
-                const bookImage = formats['image/jpeg'] || 'https://via.placeholder.com/150';
+        let clickedwishicon = false; // Initialize the clicked state
+       
+        books.forEach((book, index) => {
+            const { title, authors, formats, id, subjects } = book;
+            const authorName = authors.length > 0 ? authors[0].name : "Unknown Author";
+            const bookImage = formats['image/jpeg'] || 'https://via.placeholder.com/150';
     
-                const card = document.createElement("div");
-                card.classList.add("card");
+            const card = document.createElement("div");
+            card.classList.add("card");
     
-                card.innerHTML = `
-                <div class="d-flex mb-5 align-items-center justify-right"><p class="wishpara ">${clickedwishicon ? 'Remove from wishlist' : 'Add to wishlist'}</p> <img id="wishicon" class="wishicon" src="${isWishlisted ? './icons/love.png' : './icons/unlove.png'}" alt="love icon"></div>
-                    <img src="${bookImage}" alt="${title}" />
-                    <h2>${title}</h2>
-                    <p>ID: ${id}</p>
-                    <p>Author: ${authorName} </p>
-                    <p>Genre: ${subjects[2]} </p>
-                    
-                    
-                `;
-    
-                bookGrid.appendChild(card);
-    
-                // Add fade-in animation after small delay to create smooth effect
-                setTimeout(() => {
-                    card.classList.add('fade-in');
-                }, index * 100);
+            // Dynamically creating the card's HTML
+            card.innerHTML = `
+                <div class="d-flex mb-5 align-items-center justify-right">
+                    <p class="wishpara">${clickedwishicon ? 'Remove from wishlist' : 'Add to wishlist'}</p>
+                    <img id="wishicon-${index}" class="wishicon" src="./icons/unlove.png" alt="love icon">
+                </div>
+                <img src="${bookImage}" alt="${title}" />
+                <h2>${title}</h2>
+                <p>ID: ${id}</p>
+                <p>Author: ${authorName}</p>
+                <p>Genre: ${subjects[2]}</p>
+            `;
+            allgenres.push(subjects[2])
+            console.log(allgenres)
+            // Append the card to the book grid
+            bookGrid.appendChild(card);
+            let wishlistArr = []
+            // Attach the click event listener to the wish icon for each book
+            const wishicon = document.getElementById(`wishicon-${index}`);
+            wishicon.addEventListener("click", function () {
+                clickedwishicon = !clickedwishicon; // Toggle the wish icon state
+                wishicon.src = clickedwishicon ? './icons/love.png' : './icons/unlove.png'; // Change the icon
+                const wishText = card.querySelector(".wishpara");
+                wishText.textContent = clickedwishicon ? 'Remove from wishlist' : 'Add to wishlist'; // Update the text
+                wishlistArr.push(book)
+                console.log("Wish icon clicked!",wishlistArr);
             });
-        }
-
-      
+    
+            // Add fade-in animation after small delay to create smooth effect
+            setTimeout(() => {
+                card.classList.add('fade-in');
+            }, index * 100);
+        });
+    }
+    
+    const uniqueSubjects = [...new Set(
+        books
+            .map(book => book.subjects[1]) // Get the second subject from each book
+            .filter(subject => subject !== undefined) // Filter out undefined values
+    )];
+    console.log(uniqueSubjects)
+    // const uniqueArr = [...new Set(allgenres.filter(item => item !== null))];
+    // console.log(uniqueArr);
+    // populateDropdown(uniqueArr);
+   
+  
     
 
     // Setup pagination based on the number of books
     
 
     // Search function
+    let allBooks = [];  // Store all books globally
+
+    // Search input event listener
     searchInput.addEventListener("input", (event) => {
         const searchTerm = event.target.value.toLowerCase();
-        currentPage = 1;  // Fetch books with the search term
+        currentPage = 1;  // Reset to the first page when searching
+        const filteredBooks = filterBooks(searchTerm);  // Filter books based on the search term
+        displayBooks(filteredBooks);  // Display the filtered books
     });
+    
+    // Function to filter books by title
+    const filterBooks = (searchTerm) => {
+        return allBooks.filter(book => {
+            return book.title.toLowerCase().includes(searchTerm);
+        });
+    };
 
     // Initial fetch
     fetchBooks(1);
