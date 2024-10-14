@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    <link rel="stylesheet" href="./icons/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Book Library</h1>
+        <input type="text" id="searchInput" placeholder="Search by title..." />
+
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading books...</p>
+        </div>
+        <div id="bookGrid" class="grid-container">
+            <!-- Book cards will be injected here -->
+        </div>
+        <div class="paginationContainer">
+            <div id="prevpage" class="pagination hidden">Previous page</div>
+            <div id="nextpage" class="pagination">Next page</div>
+
+        </div>
+    </div>
+
+    <script src="custom.js"></script>
+</body>
+</html>
