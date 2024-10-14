@@ -7,6 +7,21 @@ body {
 .hidden{
     display: none!important;
 }
+.justify-right{
+    justify-content: end;
+}
+.mb-5{
+    margin-bottom: 5px;
+}
+.d-flex{
+    display: flex;;
+}
+.align-items-center{
+    align-items: center;
+}
+.wishpara{
+    font-size: 25px;
+}
 
 .container {
     max-width: 1200px;
@@ -94,9 +109,14 @@ h1 {
         grid-template-columns: 1fr;
     }
 }
-.d-flex{
-    display: flex;;
+.wishicon{
+    width: 25px;
+    height: 25px;
+    margin-top:4px;
+    margin-left: 5px;
+    cursor: pointer;;
 }
+
 .paginationContainer{
     display: flex;
     justify-content: center;
