@@ -2868,7 +2868,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextpage = document.getElementById("nextpage");
   const prevpage = document.getElementById("prevpage");
   const dropdown = document.getElementById("drpdwn");
+  const hamburger = document.querySelector('.hamburger');
+  const mobileMenu = document.querySelector('.mobile-menu');
 
+  hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+  });
   let mybooks = [];
   let allBooks = [];
   
@@ -2951,8 +2956,8 @@ document.addEventListener("DOMContentLoaded", () => {
       mybooks = [
         ...new Set(
           data.results
-            .map((book) => book.subjects[2]) // Get the third subject from each book
-            .filter((subject) => subject !== undefined) // Filter out undefined values
+            .map((book) => book.subjects[2])
+            .filter((subject) => subject !== undefined) 
         ),
       ];
       
@@ -2971,11 +2976,11 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedSubject,
         copyofallbooks
       );
-      displayBooks(filteredBooks); // Display the filtered books based on the selected subject
-      console.log(filteredBooks); // Display the filtered books based on the selected subject
+      displayBooks(filteredBooks);
+      console.log(filteredBooks);
     } else {
       displayBooks(allBooks);
-      console.log(allBooks); // Display all books if no subject is selected
+      console.log(allBooks);
     }
   };
   document
@@ -2988,11 +2993,9 @@ document.addEventListener("DOMContentLoaded", () => {
     bookGrid.innerHTML = "";
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // Optional: adds a smooth scroll effect
+      behavior: "smooth", 
     });
     fetchBooks(currentPage);
-
-    // fetchBooks(); // Call the function when clicked
   });
   prevpage.addEventListener("click", function () {
     currentPage--;
@@ -3000,116 +3003,107 @@ document.addEventListener("DOMContentLoaded", () => {
     loadingSpinner.classList.remove("hidden");
     bookGrid.innerHTML = "";
     fetchBooks(currentPage);
-
-    // fetchBooks(); // Call the function when clicked
   });
-  // Display books for the current page
+ 
+  
   const displayBooks = (books) => {
-      bookGrid.innerHTML = "";
-      let clickedwishicon = false; // Initialize the clicked state
-      
-      let wishlistArr = [];
-      books.forEach((book, index) => {
-      const { title, authors, formats, id, subjects } = book;
-      const authorName =
-        authors.length > 0 ? authors[0].name : "Unknown Author";
-      const bookImage =
-        formats["image/jpeg"] || "https://via.placeholder.com/150";
-
-      const card = document.createElement("div");
-      card.classList.add("card");
-
-      // Dynamically creating the card's HTML
-      card.innerHTML = `
-                <div class="d-flex mb-5 align-items-center justify-right">
-                    <p class="wishpara">${
-                      clickedwishicon
-                        ? "Remove from wishlist"
-                        : "Add to wishlist"
-                    }</p>
-                    <img id="wishicon-${index}" class="wishicon" src="./icons/unlove.png" alt="love icon">
-                </div>
-                <img src="${bookImage}" alt="${title}" />
-                <h2>${title}</h2>
-                <p>ID: ${id}</p>
-                <p>Author: ${authorName}</p>
-                <p>Genre: ${subjects[2]}</p>
-            `;
-      allgenres.push(subjects[2]);
-
-      // Append the card to the book grid
-      bookGrid.appendChild(card);
-    
-      // Attach the click event listener to the wish icon for each book
-      const wishicon = document.getElementById(`wishicon-${index}`);
-      wishicon.addEventListener("click", function () {
-        let clickedwishicon  // Toggle the wish icon state
-        // Update the text
-
-        const isID = wishlistArr.find((item) => item.id === book.id);
-
-        // if (clickedwishicon) {          
-        //   if (!isID) {            
-        //     wishlistArr.push(book);
-        //     clickedwishicon = false;             
-        //   }
-        // } else {          
-        //   wishlistArr = wishlistArr.filter((item) => item.id !== book.id);
-        //   console.log("mywishlist",wishlistArr)
-        //   clickedwishicon = true; 
-        // }
-
-        
-            // If the icon is currently clicked (true), we need to unclick it
+    bookGrid.innerHTML = ""; // Clear the book grid
+    let finalWishlist = JSON.parse(localStorage.getItem('finalwishlist')) || []; // Get wishlist from localStorage
+  
+    books.forEach((book, index) => {
+        const { title, authors, formats, id, subjects,bookshelves } = book;
+        const authorName = authors.length > 0 ? authors[0].name : "Unknown Author";
+        const bookImage = formats["image/jpeg"] || "https://via.placeholder.com/150";
+  
+        const card = document.createElement("div");
+        card.classList.add("card");
+  
+        // Check if the book is in the wishlist
+        const isInWishlist = finalWishlist.some((item) => item.id === book.id);
+  
+        // Set the inner HTML of the card
+        card.innerHTML = `
+            <div class="d-flex mb-5 align-items-center justify-right">
+                <p class="wishpara">${isInWishlist ? "Remove from wishlist" : "Add to wishlist"}</p>
+                <img id="wishicon-${index}" class="wishicon" src="${isInWishlist ? "./icons/love.png" : "./icons/unlove.png"}" alt="love icon">
+            </div>
+            <img src="${bookImage}" alt="${title}" class="book-image" />
+            <h2 class="book-title">${title}</h2>
+            <p>ID: ${id}</p>
+            <p>Author: ${authorName}</p>
+            <p>Genre: ${subjects[2]}</p>
+        `;
+  
+        // Append the card to the book grid
+        bookGrid.appendChild(card);
+  
+        // Handle the click event for the wishlist icon
+        const wishicon = document.getElementById(`wishicon-${index}`);
+        const wishText = card.querySelector(".wishpara");
+  
+        wishicon.addEventListener("click", function () {
+            let isID = finalWishlist.find((item) => item.id === book.id);
+  
             if (isID) {
-                // Check if the book is already in the wishlist before removing
-                clickedwishicon = false; // Set clicked state to false since we are removing the book
-                wishlistArr = wishlistArr.filter((item) => item.id !== book.id);
-                
-                console.log("mywishlist",wishlistArr) // Change the icon to indicate removal
+                // Remove the book from the wishlist
+                finalWishlist = finalWishlist.filter((item) => item.id !== book.id);
+                wishicon.src = "./icons/unlove.png"; // Change to unlove icon
+                wishText.textContent = "Add to wishlist";
+            } else {
+                // Add the book to the wishlist
+                finalWishlist.push(book);
+                wishicon.src = "./icons/love.png"; // Change to love icon
+                wishText.textContent = "Remove from wishlist";
             }
-       
-            // If the icon is not clicked, we need to add the book
-            else if (!isID) {
-                wishlistArr.push(book); // Add the book to the wishlist
-                clickedwishicon = true; 
-                console.log("mywishlist",wishlistArr) // Change the icon to indicate addition
+  
+            // Update localStorage with the new final wishlist
+            localStorage.setItem('finalwishlist', JSON.stringify(finalWishlist));
+            fetchfinalwishlist(); // Call this function if it's defined
+        });
+  
+        // Modal handling
+        const modal = document.getElementById("bookModal");
+        const modalImage = document.getElementById("modalBookImage");
+        const modalTitle = document.getElementById("modalBookTitle");
+        const modalID = document.getElementById("modalBookID");
+        const modalAuthor = document.getElementById("modalBookAuthor");
+        const modalGenre = document.getElementById("modalBookGenre");
+        const bookShelves = document.getElementById("bookShelves");
+        const closeModal = document.querySelector(".close-modal");
+  
+        const openModal = () => {
+            modal.classList.add("fade-in");
+            modalImage.src = bookImage;
+            modalTitle.textContent = title;
+            modalID.textContent = `ID: ${id}`;
+            modalAuthor.textContent = `Author: ${authorName}`;
+            modalGenre.textContent = `<b>Genre:</b> ${subjects}`;
+            bookShelves.textContent = `<b>BookShelves:</b> ${bookshelves}`;
+            modal.style.display = "flex"; // Set the modal to display flex when opening
+        };
+  
+        const closeModalFunc = () => {
+            modal.classList.remove("fade-in");
+            modal.style.display = "none"; // Hide modal
+        };
+  
+        // Add click event listeners for the book image and title
+        card.querySelector(".book-image").addEventListener("click", openModal);
+        card.querySelector(".book-title").addEventListener("click", openModal);
+  
+        closeModal.addEventListener("click", closeModalFunc);
+        window.addEventListener("click", (event) => {
+            if (event.target === modal) {
+                closeModalFunc();
             }
-            
-            localStorage.setItem('wishlist', JSON.stringify(wishlistArr));
-            wishicon.src = clickedwishicon
-            ? "./icons/love.png"
-            : "./icons/unlove.png"; // Change the icon
-          const wishText = card.querySelector(".wishpara");
-          wishText.textContent = clickedwishicon
-            ? "Remove from wishlist"
-            : "Add to wishlist"; 
-
-        // if (clickedwishicon) {
-        //     // Only add the book if it's not already in the wishlist
-        //     if (!wishlistArr.some(item => item.id === book.id)) { // Assuming each book has a unique 'id'
-        //         wishlistArr.push(book);
-        //     }
-        // } else {
-        //     // Remove the book from the wishlist if it was previously added
-        //     const bookIndex = wishlistArr.findIndex(item => item.id === book.id); // Use findIndex to locate the book
-        //     if (bookIndex > -1) {
-        //         wishlistArr.splice(bookIndex, 1); // Remove the book from the wishlist
-        //     }
-        // }
-
-      });
-      
-      
-     
-      // Add fade-in animation after small delay to create smooth effect
-      setTimeout(() => {
-        card.classList.add("fade-in");
-      }, index * 100);
+        });
+  
+        // Add fade-in animation after a small delay to create a smooth effect
+        setTimeout(() => {
+            card.classList.add("fade-in");
+        }, index * 100);
     });
-  };
-
-
+};
 
   // const uniqueArr = [...new Set(allgenres.filter(item => item !== null))];
   // console.log(uniqueArr);
@@ -3139,29 +3133,24 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
  
-
-  // Initial fetch
   fetchBooks(1);
 
-  function fetchfinalwishlist(){
-    wishlistArrlocal = JSON.parse(localStorage.getItem('wishlist')) || [];
-    let final = JSON.parse(localStorage.getItem('finalwishlist')) || []; // Fallback to an empty array if not found
-
-// Now, add the contents of wishlistArrlocal to 'final', ensuring no duplicates
-wishlistArrlocal.forEach(book => {
-    const existsInFinal = final.find(item => item.id === book.id); // Check if the item already exists
-    if (!existsInFinal) {
-        final.push(book); // Only push unique items
-    }
-});
-
-// Save the updated 'final' array back to localStorage
-localStorage.setItem('finalwishlist', JSON.stringify(final));
-
-// Now, whenever you fetch 'final', it will contain the updated items from 'wishlistArrlocal'
-console.log("Final wishlist:", final);
-
-  console.log(final)
+ 
+  
+  function fetchfinalwishlist() {
+    let wishlistArrlocal = JSON.parse(localStorage.getItem('wishlist')) || [];
+    let final = JSON.parse(localStorage.getItem('finalwishlist')) || [];
+  
+    wishlistArrlocal.forEach((book) => {
+      const existsInFinal = final.find((item) => item.id === book.id);
+      if (!existsInFinal) {
+        final.push(book);
+      }
+    });
+    localStorage.setItem('finalwishlist', JSON.stringify(final));
+    
+    console.log("Final wishlist:", final);
   }
-  fetchfinalwishlist()
+  
+  fetchfinalwishlist();
 });

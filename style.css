@@ -19,14 +19,171 @@ body {
 .align-items-center{
     align-items: center;
 }
+   /* navbar */
+
+   .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+}
+
+.logo h2 {
+    font-size: 24px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin-left: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+}
+
+.hamburger {
+    display: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.hamburger .line {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+}
+
+.mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out; /* Use max-height for smooth transition */
+    background-color: #333;
+    padding: 0; /* Set padding to 0 initially */
+}
+
+.mobile-menu ul {
+    list-style: none;
+    padding: 0;
+}
+
+.mobile-menu ul li {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.mobile-menu ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+}
+
+.mobile-menu.open {
+    max-height: 300px; /* Set an appropriate max-height */
+    padding: 10px 0; /* Restore padding when opened */
+}
+
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+}
+
+   /* navbar end */
+
+   /* bookmodal */
+
+   /* The Modal (background) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    
+    align-items: left;
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    width: 60%;
+    position: relative;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .modal-content p b{
+    font-weight: 700;
+  }
+  
+  /* Close Button */
+  .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  /* Image in Modal */
+  .modal-content img {
+    width: 150px;
+    height: 220px;
+    object-fit: cover;
+  }
+  
+  /* Fade-in animation for the modal */
+  .modal.fade-in {
+    display: flex;
+    animation: fadeIn 0.3s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+
+   /* bookmodal end */
+
+.filters select{
+    width:200px;
+}
+
+
 .wishpara{
     font-size: 25px;
 }
 .filters{
     display: flex;
-    justify-content: space-between;
+    gap:20px;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     margin-bottom: 20px;
+    flex-grow: 1;
 }
 .filters select{
     padding: 10px;
@@ -86,7 +243,7 @@ h1 {
     display: none;
 }
 #searchInput {
-    width: 300px;
+    width: 200px;
     padding: 10px;
     margin-bottom: 20px;
     font-size: 16px;
