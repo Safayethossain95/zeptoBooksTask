@@ -2908,29 +2908,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fetch books for the specified page
   const fetchBooks = async (page = 1, searchterm = "") => {
     loadingSpinner.classList.remove("hidden");
-   
-    // console.log("Loaded wishlist from localStorage:", wishlistArrlocal);
-    // wishlistArrlocal.forEach(book => {
-    //     const existsInFinal = FinalWishList.find(item => item.id === book.id);
-    //     if (!existsInFinal) {
-    //         FinalWishList.push(book); // Only push unique items
-    //         localStorage.setItem('finalwishlist', JSON.stringify(FinalWishList));
-    //     }
-    //     // console.log("final wishlist", FinalWishList)
-    // });
-   
-    
-    // Optional: Console log the final wishlist for debugging
     console.log("Final Wishlist:", FinalWishList);
-
-   
-    
     if (page == 1) {
       prevpage.classList.add("hidden");
     }
     if (page > 1) {
       prevpage.classList.remove("hidden");
-    } // Show loading
+    } 
     try {
     //   let url = `https://gutendex.com/books/?page=${page}`; // Use the page number in the URL
 
@@ -2945,14 +2929,8 @@ document.addEventListener("DOMContentLoaded", () => {
         allBooks = api.results;
     }
       
-    //   allBooks = data.results
-      // Hide loading spinner
       loadingSpinner.classList.add("hidden");
-
-      // Store books data
-      const totalBooks = data.count; // Total number of books
-
-      // Display books and setup pagination based on the fetched data
+      const totalBooks = data.count; 
       mybooks = [
         ...new Set(
           data.results
@@ -2960,32 +2938,35 @@ document.addEventListener("DOMContentLoaded", () => {
             .filter((subject) => subject !== undefined) 
         ),
       ];
-      
-
       populateDropdown(mybooks);
-      displayBooks(data.results);
+      
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  const handleSubjectChange = () => {
-    const selectedSubject = dropdown.value;
-    if (selectedSubject !== "") {
-      let copyofallbooks = allBooks;
-      const filteredBooks = filterBooksBySubject(
-        selectedSubject,
-        copyofallbooks
-      );
-      displayBooks(filteredBooks);
-      console.log(filteredBooks);
-    } else {
-      displayBooks(allBooks);
-      console.log(allBooks);
-    }
-  };
-  document
-    .getElementById("drpdwn")
-    .addEventListener("change", handleSubjectChange);
+  // const handleSubjectChange = () => {
+  //   const selectedSubject = dropdown.value;
+  //   localStorage.setItem("selectedSubject", selectedSubject); 
+    
+  //     if (selectedSubject !== "") {
+  //       let copyofallbooks = allBooks;
+  //       const filteredBooks = filterBooksBySubject(
+  //         selectedSubject,
+  //         copyofallbooks
+  //       );
+  //       displayBooks(filteredBooks);
+  //       console.log(filteredBooks);
+  //     } else {
+  //       displayBooks(allBooks);
+  //       console.log(allBooks);
+  //     }
+    
+    
+  // };
+  // document
+  //   .getElementById("drpdwn")
+  //   .addEventListener("change", handleSubjectChange);
 
   nextpage.addEventListener("click", function () {
     currentPage++;
@@ -2997,6 +2978,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     fetchBooks(currentPage);
   });
+
+ 
   prevpage.addEventListener("click", function () {
     currentPage--;
     prevpage.classList.remove("hidden");
@@ -3007,6 +2990,7 @@ document.addEventListener("DOMContentLoaded", () => {
  
   
   const displayBooks = (books) => {
+    
     bookGrid.innerHTML = ""; // Clear the book grid
     let finalWishlist = JSON.parse(localStorage.getItem('finalwishlist')) || []; // Get wishlist from localStorage
   
@@ -3103,24 +3087,14 @@ document.addEventListener("DOMContentLoaded", () => {
             card.classList.add("fade-in");
         }, index * 100);
     });
+  
 };
 
-  // const uniqueArr = [...new Set(allgenres.filter(item => item !== null))];
-  // console.log(uniqueArr);
-  // populateDropdown(uniqueArr);
+ 
 
-  // Setup pagination based on the number of books
 
-  // Search function
-  // Store all books globally
 
-  // Search input event listener
-  searchInput.addEventListener("input", (event) => {
-    const searchTerm = event.target.value.toLowerCase();
-    currentPage = 1; // Reset to the first page when searching
-    const filteredBooks = filterBooks(searchTerm); // Filter books based on the search term
-    displayBooks(filteredBooks); // Display the filtered books
-  });
+ 
 
   // Function to filter books by title
   const filterBooks = (searchTerm) => {
@@ -3140,17 +3114,86 @@ document.addEventListener("DOMContentLoaded", () => {
   function fetchfinalwishlist() {
     let wishlistArrlocal = JSON.parse(localStorage.getItem('wishlist')) || [];
     let final = JSON.parse(localStorage.getItem('finalwishlist')) || [];
-  
-    wishlistArrlocal.forEach((book) => {
-      const existsInFinal = final.find((item) => item.id === book.id);
-      if (!existsInFinal) {
-        final.push(book);
-      }
-    });
-    localStorage.setItem('finalwishlist', JSON.stringify(final));
     
-    console.log("Final wishlist:", final);
+
+      wishlistArrlocal.forEach((book) => {
+        const existsInFinal = final.find((item) => item.id === book.id);
+        if (!existsInFinal) {
+          final.push(book);
+        }
+      });
+      localStorage.setItem('finalwishlist', JSON.stringify(final));
+      
+      console.log("Final wishlist:", final);
+    
   }
   
   fetchfinalwishlist();
+
+  function persistentseletion() {
+    // Set dropdown value from localStorage or use default
+    // dropdown.value = "filter by genre" 
+
+    
+    let persistanseletedvalue = localStorage.getItem("selectedSubject"); // Get the selected subject
+
+    if (persistanseletedvalue ) {
+        let copyofallbooks = allBooks; 
+        const filteredBooks = filterBooksBySubject(persistanseletedvalue, copyofallbooks);
+        displayBooks(filteredBooks);
+        dropdown.value=persistanseletedvalue
+    } else {
+        displayBooks(allBooks); 
+    }
+
+    dropdown.addEventListener("change", (event) => {
+        const selectedValue = event.target.value;
+        localStorage.setItem("selectedSubject", selectedValue); 
+        
+        if (selectedValue ) {
+            let copyofallbooks = allBooks; 
+            const filteredBooks = filterBooksBySubject(selectedValue, copyofallbooks); 
+            displayBooks(filteredBooks); 
+            console.log("normal filter");// Log the filtered books
+        } else {
+            displayBooks(allBooks); // If selected value is empty or default, display all books
+            console.log(allBooks);
+            localStorage.setItem("selectedSubject", "");
+            
+            // localStorage.setItem("selectedSubject", selectedValue);
+             // Log all books
+        }
+    });
+}
+
+persistentseletion()
+
+
+  function searchinputpersist() {
+    const savedSearchTerm = localStorage.getItem("searchterm");
+    searchInput.value = savedSearchTerm || ""; // Set input field with saved value or empty string
+    
+    if (savedSearchTerm && savedSearchTerm !== "") {
+      // If there's a saved search term, filter and display the books
+      const filteredBooks = filterBooks(savedSearchTerm);
+      displayBooks(filteredBooks);
+    } 
+  
+    // Add event listener to capture and save new search terms
+    searchInput.addEventListener("input", (event) => {
+      const searchTerm = event.target.value.toLowerCase();
+      localStorage.setItem("searchterm", searchTerm); // Save new search term
+      
+      if (searchTerm === "") {
+        // If search term is empty, display all books
+        displayBooks(allBooks);
+      } else {
+        // Filter and display books based on search term
+        const filteredBooks = filterBooks(searchTerm);
+        displayBooks(filteredBooks);
+      }
+    });
+  }
+  
+  searchinputpersist()
 });
