@@ -20,7 +20,7 @@ This is a simple web application built using HTML, CSS, and JavaScript that allo
 
 ## Demo
 
-You can view a live demo of the project here: [Live Demo](https://github.com/Safayethossain95/zeptoBooksTask)
+You can view a live demo of the project here: [Live Demo](https://bkbooks.vercel.app)
 
 ## Technologies Used
 
