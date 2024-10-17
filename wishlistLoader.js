@@ -42,68 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     let FinalWishList=[]
 
-    // const displayBooks = (books) => {
-      
-    //     wishlistGrid.innerHTML = ""
-    //     let finalWishlist = JSON.parse(localStorage.getItem('finalwishlist')) || [];
-      
-    //     books.forEach((book, index) => {
-    //       const { title, authors, formats, id, subjects } = book;
-    //       const authorName = authors.length > 0 ? authors[0].name : "Unknown Author";
-    //       const bookImage = formats["image/jpeg"] || "https://via.placeholder.com/150";
-      
-    //       const card = document.createElement("div");
-    //       card.classList.add("card");
-      
-    //       const isInWishlist = finalWishlist.some((item) => item.id === book.id);
-      
-          
-    //       card.innerHTML = `
-    //         <div class="d-flex mb-5 align-items-center justify-right">
-    //             <p class="wishpara">${
-    //               isInWishlist ? "Remove from wishlist" : "Add to wishlist"
-    //             }</p>
-    //             <img id="wishicon-${index}" class="wishicon" src="${
-    //               isInWishlist ? "./icons/love.png" : "./icons/unlove.png"
-    //             }" alt="love icon">
-    //         </div>
-    //         <img src="${bookImage}" alt="${title}" />
-    //         <h2>${title}</h2>
-    //         <p>ID: ${id}</p>
-    //         <p>Author: ${authorName}</p>
-    //         <p>Genre: ${subjects[2]}</p>
-    //       `;
-      
-    //       wishlistGrid.appendChild(card);
-         
-    //       const wishicon = document.getElementById(`wishicon-${index}`);
-    //       const wishText = card.querySelector(".wishpara");
-      
-    //       wishicon.addEventListener("click", function () {
-    //         let isID = finalWishlist.find((item) => item.id === book.id);
-      
-    //         if (isID) {
-            
-    //           finalWishlist = finalWishlist.filter((item) => item.id !== book.id);
-    //           wishicon.src = "./icons/unlove.png"; 
-    //           wishText.textContent = "Add to wishlist";
-    //         } else {
-             
-    //           finalWishlist.push(book);
-    //           wishicon.src = "./icons/love.png"; 
-    //           wishText.textContent = "Remove from wishlist";
-    //         }
-      
-    //         localStorage.setItem('finalwishlist', JSON.stringify(finalWishlist));
-    //         fetchfinalwishlist()
-    //       });
-      
-    //       setTimeout(() => {
-    //         card.classList.add("fade-in");
-    //       }, index * 100);
-    //     });
-    //   };
-    
+  
     const displayBooks = (books) => {
         wishlistGrid.innerHTML = "";
         let finalWishlist = JSON.parse(localStorage.getItem("finalwishlist")) || [];
@@ -139,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const wishicon = document.getElementById(`wishicon-${index}`);
           const wishText = card.querySelector(".wishpara");
       
-          // Handle wishlist toggle
           wishicon.addEventListener("click", function () {
             let isID = finalWishlist.find((item) => item.id === book.id);
       
@@ -157,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
             fetchfinalwishlist();
           });
       
-          // Handle modal opening when the image or title is clicked
           const modal = document.getElementById("bookModal");
           const modalImage = document.getElementById("modalBookImage");
           const modalTitle = document.getElementById("modalBookTitle");
@@ -206,7 +143,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       };
       
-    
+    searchInput.addEventListener("input", (event) => {
+        const searchTerm = event.target.value.toLowerCase();
+        currentPage = 1; 
+        const filteredBooks = filterBooks(searchTerm); 
+        displayBooks(filteredBooks);
+        console.log(searchTerm) 
+      });
     
       const filterBooks = (searchTerm) => {
         return allBooks.filter((book) => {
@@ -217,11 +160,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return copyofallbooks.filter((book) => book.subjects[2] === optionValue);
       };
 
-     
-    
     const handleSubjectChange = () => {
       const selectedSubject = dropdown.value;
-      localStorage.setItem("selectedSubjectwishlist", selectedSubject); 
       if (selectedSubject !== "") {
         let copyofallbooks = allBooks;
         const filteredBooks = filterBooksBySubject(
@@ -239,99 +179,25 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("drpdwn")
     .addEventListener("change", handleSubjectChange);
   
- 
-  
     if (!wishlistGrid) {
       console.error("wishlistGrid element not found in the DOM.");
       return;
     }
-    
     // Call this function when loading the page to display wishlist from localStorage
     function fetchfinalwishlist() {
-      // Get final wishlist from local storage or set it to an empty array if not available
       let final = JSON.parse(localStorage.getItem('finalwishlist')) || [];
-  
-      // Get the persisted selected subject or set it to an empty string if not available
-      let persistanseletedvalue = localStorage.getItem("selectedSubjectwishlist") || "";
-  
-      // Check if a persistent selection exists and is not an empty string
-      if (persistanseletedvalue !== "") {
-          persitentseletion(); // Call the function to handle persistent selection
-      } else {
-          // If no persistent selection, proceed with displaying the full wishlist
-          localStorage.setItem('finalwishlist', JSON.stringify(final));
-          displayBooks(final); // Function to display books on the page
-          allBooks = final;
-  
-          // Extract unique subjects from the books and filter out undefined values
-          mybooks = [
-              ...new Set(
-                  allBooks
-                  .map((book) => book.subjects ? book.subjects[2] : undefined) // Handle undefined subjects safely
-                  .filter((subject) => subject !== undefined) // Filter out undefined subjects
-              ),
-          ];
-  
-          // Populate the dropdown with the unique subjects
-          populateDropdown(mybooks);
-          console.log("Final wishlist:", final);
-      }
-  }
-  
-    
+      localStorage.setItem('finalwishlist', JSON.stringify(final));
+      displayBooks(final)
+      allBooks=final
+      mybooks = [
+        ...new Set(
+            allBooks
+            .map((book) => book.subjects[2]) 
+            .filter((subject) => subject !== undefined) 
+        ),
+      ];
+      populateDropdown(mybooks);
+      console.log("Final wishlist:", final);
+    }
     fetchfinalwishlist();
-    
-    function persitentseletion (){
-      dropdown.value=localStorage.getItem("selectedSubjectwishlist")
-      let persistanseletedvalue = localStorage.getItem("selectedSubjectwishlist")
-      if(persistanseletedvalue){
-        if (persistanseletedvalue !== "") {
-          let copyofallbooks = allBooks;
-          const filteredBooks = filterBooksBySubject(
-            persistanseletedvalue,
-            copyofallbooks
-          );
-          displayBooks(filteredBooks);
-          console.log("filteredbookformperselect");
-        } else {
-          displayBooks(allBooks);
-          
-          console.log("allbooks");
-        }
-      }else{
-        dropdown.value=""
-      }
-    }
-  
-    persitentseletion()
-    function searchinputpersist() {
-      const savedSearchTerm = localStorage.getItem("searchtermwishlist");
-      searchInput.value = savedSearchTerm || ""; // Set input field with saved value or empty string
-      
-      if (savedSearchTerm && savedSearchTerm !== "") {
-        // If there's a saved search term, filter and display the books
-        const filteredBooks = filterBooks(savedSearchTerm);
-        displayBooks(filteredBooks);
-      } else {
-        // If no search term is saved, display all books
-        displayBooks(allBooks);
-      }
-    
-      // Add event listener to capture and save new search terms
-      searchInput.addEventListener("input", (event) => {
-        const searchTerm = event.target.value.toLowerCase();
-        localStorage.setItem("searchtermwishlist", searchTerm); // Save new search term
-        
-        if (searchTerm === "") {
-          // If search term is empty, display all books
-          displayBooks(allBooks);
-        } else {
-          // Filter and display books based on search term
-          const filteredBooks = filterBooks(searchTerm);
-          displayBooks(filteredBooks);
-        }
-      });
-    }
-    
-    searchinputpersist()
   });
